@@ -64,7 +64,7 @@ controller.hears(`${redashHost}/queries/([0-9]+)#([0-9]+)`, ["direct_message", "
 
     const options = {
       token: slackBotToken,
-      filename: `${queryId}_${visualizationId}.png`,
+      filename: `query-${queryId}-visualization-${visualizationId}.png`,
       file: fs.createReadStream(outputFile),
       channels: message.channel
     };
