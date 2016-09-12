@@ -12,6 +12,9 @@
     },
     "SLACK_BOT_TOKEN": {
       "description": "Slack bot token, for more detail see https://api.slack.com/bot-users"
+    },
+    "REDASH_HOSTS_AND_API_KEYS": {
+      "description": "If you want to use multiple Re:dash at once, specify like http://redash1.example.com;TOKEN1,http://redash2.example.com;TOKEN2"
     }
   },
   "formation": {
