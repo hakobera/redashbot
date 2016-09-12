@@ -1,15 +1,11 @@
 {
   "name": "redashbot",
   "version": "1.0.0",
-  "description": "",
+  "description": "Slack Bot for re:dash",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "engiens": {
     "node": ">= 6.0"
   },
-  "author": "Kazuyuki Honda",
   "license": "MIT",
   "dependencies": {
     "botkit": "^0.2.2",
