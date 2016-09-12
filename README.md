@@ -27,3 +27,21 @@ $ node index.js
 You can easy to deploy redashbot to Heroku, just click following button.
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
+## Environment variables
+
+### SLACK_BOT_TOKEN (required)
+
+Slack's Bot User Token
+
+### REDASH_HOST and REDASH_API_KEY (optional)
+
+Re:dash's URL and its API Key.
+
+### REDASH_HOSTS_AND_API_KEYS (optional)
+
+If you want to use multiple Re:dash at once, specify this variable like below
+
+```
+REDASH_HOSTS_AND_API_KEYS="http://redash1.example.com;TOKEN1,http://redash2.example.com;TOKEN2"
+```
