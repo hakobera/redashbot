@@ -1,0 +1,27 @@
+{
+  "name": "Slack Bot for re:dash",
+  "description": "A slack bot for re:dash, it can get screen capture of re:dash visualization",
+  "repository": "https://github.com/hakobera/redashbot",
+  "keywords": ["re:dash", "slack", "bot"],
+  "env": {
+    "REDASH_HOST": {
+      "description": "URL of your re:dash server, like https://your-redash-server.example.com"
+    },
+    "REDASH_API_KEY": {
+      "description": "API key of your re:dash account"
+    },
+    "SLACK_BOT_TOKEN": {
+      "description": "Slack bot token, for more detail see https://api.slack.com/bot-users"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 0
+    },
+    "worker": {
+      "quantity": 1,
+      "size": "hobby"
+    }
+  },
+  "image": "heroku/nodejs"
+}
