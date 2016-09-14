@@ -4,17 +4,21 @@
   "repository": "https://github.com/hakobera/redashbot",
   "keywords": ["re:dash", "slack", "bot"],
   "env": {
+    "SLACK_BOT_TOKEN": {
+      "description": "Slack bot token, for more detail see https://api.slack.com/bot-users",
+      "required": true
+    },
     "REDASH_HOST": {
-      "description": "URL of your re:dash server, like https://your-redash-server.example.com"
+      "description": "URL of your re:dash server, like https://your-redash-server.example.com",
+      "required": false
     },
     "REDASH_API_KEY": {
-      "description": "API key of your re:dash account"
-    },
-    "SLACK_BOT_TOKEN": {
-      "description": "Slack bot token, for more detail see https://api.slack.com/bot-users"
+      "description": "API key of your re:dash account",
+      "required": false
     },
     "REDASH_HOSTS_AND_API_KEYS": {
-      "description": "If you want to use multiple Re:dash at once, specify like http://redash1.example.com;TOKEN1,http://redash2.example.com;TOKEN2"
+      "description": "If you want to use multiple Re:dash at once, specify like http://redash1.example.com;TOKEN1,http://redash2.example.com;TOKEN2",
+      "required": false
     }
   },
   "formation": {
