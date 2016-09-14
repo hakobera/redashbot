@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Slack Bot for re:dash",
   "main": "index.js",
-  "engiens": {
+  "engines": {
     "node": ">= 6.0"
   },
   "license": "MIT",
