@@ -71,8 +71,8 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
         return bot.botkit.log.error(msg);
       }
 
-      bot.botkit.log(outputFile);
-      bot.botkit.log(Object.keys(message));
+      bot.botkit.log.debug(outputFile);
+      bot.botkit.log.debug(Object.keys(message));
       bot.botkit.log(message.user + ":" + message.type + ":" + message.channel + ":" + message.text);
 
       const options = {
