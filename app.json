@@ -12,6 +12,10 @@
       "description": "URL of your re:dash server, like https://your-redash-server.example.com",
       "required": false
     },
+    "REDASH_HOST_ALIAS": {
+      "description": "URL of your re:dash server accessible from the bot.",
+      "required": false
+    },
     "REDASH_API_KEY": {
       "description": "API key of your re:dash account",
       "required": false
