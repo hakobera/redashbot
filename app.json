@@ -19,6 +19,10 @@
     "REDASH_HOSTS_AND_API_KEYS": {
       "description": "If you want to use multiple Re:dash at once, specify like http://redash1.example.com;TOKEN1,http://redash2.example.com;TOKEN2",
       "required": false
+    },
+    "SLACK_MESSAGE_EVENTS": {
+      "description": "Message events this bot reacts. Default is \"direct_message,direct_mention,mention\"Available values are listed in https://github.com/howdyai/botkit/blob/master/readme-slack.md#message-received-events",
+      "required": false
     }
   },
   "formation": {
