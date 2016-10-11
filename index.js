@@ -6,6 +6,9 @@ const tempfile = require("tempfile");
 const fs = require("fs");
 const request = require("request");
 
+// This configuration can gets overwritten when process.env.SLACK_MESSAGE_EVENTS is given.
+const DEFAULT_SLACK_MESSAGE_EVENTS = "direct_message,direct_mention,mention";
+
 if (!process.env.SLACK_BOT_TOKEN) {
   console.error(`Error: Specify SLACK_BOT_TOKEN in environment values`);
   process.exit(1);
@@ -31,6 +34,7 @@ const parseApiKeysPerHost = () => {
 
 const redashApiKeysPerHost = parseApiKeysPerHost();
 const slackBotToken = process.env.SLACK_BOT_TOKEN;
+const slackMessageEvents = process.env.SLACK_MESSAGE_EVENTS || DEFAULT_SLACK_MESSAGE_EVENTS;
 
 const controller = Botkit.slackbot({
   debug: !!process.env.DEBUG
@@ -41,7 +45,7 @@ const bot = controller.spawn({
 }).startRTM();
 
 Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
-  controller.hears(`${redashHost}/queries/([0-9]+)#([0-9]+)`, ["direct_message", "direct_mention", "mention"], (bot, message) => {
+  controller.hears(`${redashHost}/queries/([0-9]+)#([0-9]+)`, slackMessageEvents, (bot, message) => {
     const redashApiKey = redashApiKeysPerHost[redashHost];
     const queryId = message.match[1];
     const visualizationId =  message.match[2];
