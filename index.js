@@ -22,11 +22,19 @@ if (!((process.env.REDASH_HOST && process.env.REDASH_API_KEY) || (process.env.RE
 
 const parseApiKeysPerHost = () => {
   if (process.env.REDASH_HOST) {
-    return {[process.env.REDASH_HOST]: process.env.REDASH_API_KEY};
+    if (process.env.REDASH_HOST_ALIAS) {
+      return {[process.env.REDASH_HOST]: {"alias": process.env.REDASH_HOST_ALIAS, "key": process.env.REDASH_API_KEY}};
+    } else {
+      return {[process.env.REDASH_HOST]: {"alias": process.env.REDASH_HOST, "key": process.env.REDASH_API_KEY}};
+    }
   } else {
     return process.env.REDASH_HOSTS_AND_API_KEYS.split(",").reduce((m, host_and_key) => {
-      const [host, key] = host_and_key.split(";");
-      m[host] = key;
+      var [host, alias, key] = host_and_key.split(";");
+      if (!key) {
+        key = alias;
+        alias = host;
+      }
+      m[host] = {"alias": alias, "key": key};
       return m;
     }, {});
   }
@@ -45,14 +53,16 @@ const bot = controller.spawn({
 }).startRTM();
 
 Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
+  const redashHostAlias = redashApiKeysPerHost[redashHost]["alias"];
+  const redashApiKey    = redashApiKeysPerHost[redashHost]["key"];
   controller.hears(`${redashHost}/queries/([0-9]+)#([0-9]+)`, slackMessageEvents, (bot, message) => {
-    const redashApiKey = redashApiKeysPerHost[redashHost];
+    const originalUrl = message.match[0];
     const queryId = message.match[1];
     const visualizationId =  message.match[2];
-    const queryUrl = `${redashHost}/queries/${queryId}#${visualizationId}`;
-    const embedUrl = `${redashHost}/embed/query/${queryId}/visualization/${visualizationId}?api_key=${redashApiKey}`;
+    const queryUrl = `${redashHostAlias}/queries/${queryId}#${visualizationId}`;
+    const embedUrl = `${redashHostAlias}/embed/query/${queryId}/visualization/${visualizationId}?api_key=${redashApiKey}`;
 
-    bot.reply(message, `Taking screenshot of ${queryUrl}`);
+    bot.reply(message, `Taking screenshot of ${originalUrl}`);
     bot.botkit.log(queryUrl);
     bot.botkit.log(embedUrl);
 

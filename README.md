@@ -38,12 +38,21 @@ Slack's Bot User Token
 
 Re:dash's URL and its API Key.
 
+## REDASH_HOST_ALIAS (optional)
+Re:dash' URL accessible from the bot.
+
 ### REDASH_HOSTS_AND_API_KEYS (optional)
 
 If you want to use multiple Re:dash at once, specify this variable like below
 
 ```
 REDASH_HOSTS_AND_API_KEYS="http://redash1.example.com;TOKEN1,http://redash2.example.com;TOKEN2"
+```
+
+or if you need to specify REDASH_HOST_ALIAS for each Re:dash, like below
+
+```
+REDASH_HOSTS_AND_API_KEYS="http://redash1.example.com;http://redash1-alias.example.com;TOKEN1,http://redash2.example.com;TOKEN2"
 ```
 
 ### SLACK_MESSAGE_EVENTS (optional)
