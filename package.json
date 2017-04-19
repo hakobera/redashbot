@@ -9,8 +9,8 @@
   "license": "MIT",
   "dependencies": {
     "botkit": "^0.2.2",
+    "nightmare": "^2.10.0",
     "request": "^2.74.0",
-    "tempfile": "^1.1.1",
-    "webshot": "^0.18.0"
+    "tempfile": "^1.1.1"
   }
 }

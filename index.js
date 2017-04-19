@@ -1,7 +1,7 @@
 "use strict";
 
 const Botkit = require("botkit");
-const webshot = require("webshot");
+const Nightmare = require('nightmare');
 const tempfile = require("tempfile");
 const fs = require("fs");
 const request = require("request");
@@ -67,24 +67,22 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
     bot.botkit.log(embedUrl);
 
     const outputFile = tempfile(".png");
-    const webshotOptions = {
-      screenSize: {
-        width: 720,
-        height: 360
-      },
-      shotSize: {
-        width: 720,
-        height: "all"
-      }
+    const screenshotOptions = {
+      x: 0,
+      y: 0,
+      width: 960,
+      height: 440
     };
 
-    webshot(embedUrl, outputFile, webshotOptions, (err) => {
-      if (err) {
-        const msg = `Something wrong happend in take a screen capture : ${err}`;
-        bot.reply(message, msg);
-        return bot.botkit.log.error(msg);
-      }
-
+    const nightmare = Nightmare();
+    Promise.resolve(
+      nightmare
+        .viewport(960, 480)
+        .goto(embedUrl)
+        .wait(".tile:first-child")
+        .screenshot(outputFile, screenshotOptions)
+        .end()
+    ).then(() => {
       bot.botkit.log.debug(outputFile);
       bot.botkit.log.debug(Object.keys(message));
       bot.botkit.log(message.user + ":" + message.type + ":" + message.channel + ":" + message.text);
@@ -110,6 +108,10 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
           bot.botkit.log.error(msg);
         }
       });
+    }, (err) => {
+      const msg = `Something wrong happend in take a screen capture : ${err}`;
+      bot.reply(message, msg);
+      bot.botkit.log.error(msg);
     });
   });
 });
