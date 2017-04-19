@@ -10,7 +10,7 @@ const request = require("request");
 const DEFAULT_SLACK_MESSAGE_EVENTS = "direct_message,direct_mention,mention";
 
 if (!process.env.SLACK_BOT_TOKEN) {
-  console.error(`Error: Specify SLACK_BOT_TOKEN in environment values`);
+  console.error("Error: Specify SLACK_BOT_TOKEN in environment values");
   process.exit(1);
 }
 if (!((process.env.REDASH_HOST && process.env.REDASH_API_KEY) || (process.env.REDASH_HOSTS_AND_API_KEYS))) {
@@ -48,7 +48,7 @@ const controller = Botkit.slackbot({
   debug: !!process.env.DEBUG
 });
 
-const bot = controller.spawn({
+controller.spawn({
   token: slackBotToken
 }).startRTM();
 
