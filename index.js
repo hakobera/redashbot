@@ -75,7 +75,9 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
       shotSize: {
         width: 720,
         height: "all"
-      }
+      },
+      renderDelay: 1000,
+      timeout: 100000
     };
 
     webshot(embedUrl, outputFile, webshotOptions, (err) => {
