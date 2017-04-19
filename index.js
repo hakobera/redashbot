@@ -76,7 +76,7 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
         width: 720,
         height: "all"
       },
-      renderDelay: 1000,
+      renderDelay: 2000,
       timeout: 100000
     };
 
