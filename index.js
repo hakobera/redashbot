@@ -55,60 +55,66 @@ controller.spawn({
 Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
   const redashHostAlias = redashApiKeysPerHost[redashHost]["alias"];
   const redashApiKey    = redashApiKeysPerHost[redashHost]["key"];
-  controller.hears(`${redashHost}/queries/([0-9]+)#([0-9]+)`, slackMessageEvents, (bot, message) => {
-    const originalUrl = message.match[0];
-    const queryId = message.match[1];
-    const visualizationId =  message.match[2];
-    const queryUrl = `${redashHostAlias}/queries/${queryId}#${visualizationId}`;
-    const embedUrl = `${redashHostAlias}/embed/query/${queryId}/visualization/${visualizationId}?api_key=${redashApiKey}`;
 
-    bot.reply(message, `Taking screenshot of ${originalUrl}`);
-    bot.botkit.log(queryUrl);
-    bot.botkit.log(embedUrl);
+  const matchStr = `${redashHost}/queries/([0-9]+)#([0-9]+)`;
+  const matchPattern = new RegExp(matchStr, 'g');
+  controller.hears([matchPattern], slackMessageEvents, (bot, message) => {
+    bot.botkit.log(JSON.stringify(message));
+    message.text.match(matchPattern).forEach((originalUrl) => {
+      const matched = originalUrl.match(matchStr);
+      const queryId = matched[1];
+      const visualizationId =  matched[2];
+      const queryUrl = `${redashHostAlias}/queries/${queryId}#${visualizationId}`;
+      const embedUrl = `${redashHostAlias}/embed/query/${queryId}/visualization/${visualizationId}?api_key=${redashApiKey}`;
 
-    const outputFile = tempfile(".png");
-    const webshotOptions = {
-      screenSize: {
-        width: 720,
-        height: 360
-      },
-      shotSize: {
-        width: 720,
-        height: "all"
-      }
-    };
+      bot.reply(message, `Taking screenshot of ${originalUrl}`);
+      bot.botkit.log(queryUrl);
+      bot.botkit.log(embedUrl);
 
-    webshot(embedUrl, outputFile, webshotOptions, (err) => {
-      if (err) {
-        const msg = `Something wrong happend in take a screen capture : ${err}`;
-        bot.reply(message, msg);
-        return bot.botkit.log.error(msg);
-      }
-
-      bot.botkit.log.debug(outputFile);
-      bot.botkit.log.debug(Object.keys(message));
-      bot.botkit.log(message.user + ":" + message.type + ":" + message.channel + ":" + message.text);
-
-      const options = {
-        token: slackBotToken,
-        filename: `query-${queryId}-visualization-${visualizationId}.png`,
-        file: fs.createReadStream(outputFile),
-        channels: message.channel
+      const outputFile = tempfile(".png");
+      const webshotOptions = {
+        screenSize: {
+          width: 720,
+          height: 360
+        },
+        shotSize: {
+          width: 720,
+          height: "all"
+        }
       };
 
-      // bot.api.file.upload cannot upload binary file correctly, so directly call Slack API.
-      request.post({ url: "https://api.slack.com/api/files.upload", formData: options }, (err, resp, body) => {
+      webshot(embedUrl, outputFile, webshotOptions, (err) => {
         if (err) {
-          const msg = `Something wrong happend in file upload : ${err}`;
+          const msg = `Something wrong happend in take a screen capture : ${err}`;
           bot.reply(message, msg);
-          bot.botkit.log.error(msg);
-        } else if (resp.statusCode == 200) {
-          bot.botkit.log("ok");
-        } else {
-          const msg = `Something wrong happend in file upload : status code=${resp.statusCode}`;
-          bot.reply(message, msg);
-          bot.botkit.log.error(msg);
+          return bot.botkit.log.error(msg);
         }
+
+        bot.botkit.log.debug(outputFile);
+        bot.botkit.log.debug(Object.keys(message));
+        bot.botkit.log(message.user + ":" + message.type + ":" + message.channel + ":" + message.text);
+
+        const options = {
+          token: slackBotToken,
+          filename: `query-${queryId}-visualization-${visualizationId}.png`,
+          file: fs.createReadStream(outputFile),
+          channels: message.channel
+        };
+
+        // bot.api.file.upload cannot upload binary file correctly, so directly call Slack API.
+        request.post({ url: "https://api.slack.com/api/files.upload", formData: options }, (err, resp, body) => {
+          if (err) {
+            const msg = `Something wrong happend in file upload : ${err}`;
+            bot.reply(message, msg);
+            bot.botkit.log.error(msg);
+          } else if (resp.statusCode == 200) {
+            bot.botkit.log("ok");
+          } else {
+            const msg = `Something wrong happend in file upload : status code=${resp.statusCode}`;
+            bot.reply(message, msg);
+            bot.botkit.log.error(msg);
+          }
+        });
       });
     });
   });
