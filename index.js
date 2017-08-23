@@ -5,6 +5,8 @@ const webshot = require("webshot");
 const tempfile = require("tempfile");
 const fs = require("fs");
 const request = require("request");
+const url = require("url");
+const querystring = require("querystring");
 
 // This configuration can gets overwritten when process.env.SLACK_MESSAGE_EVENTS is given.
 const DEFAULT_SLACK_MESSAGE_EVENTS = "direct_message,direct_mention,mention";
@@ -40,6 +42,12 @@ const parseApiKeysPerHost = () => {
   }
 };
 
+const queryToSearch = (query) => {
+  const str = querystring.stringify(query);
+  if(str.length === 0) return "";
+  return `?${str}`;
+};
+
 const redashApiKeysPerHost = parseApiKeysPerHost();
 const slackBotToken = process.env.SLACK_BOT_TOKEN;
 const slackMessageEvents = process.env.SLACK_MESSAGE_EVENTS || DEFAULT_SLACK_MESSAGE_EVENTS;
@@ -55,12 +63,21 @@ controller.spawn({
 Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
   const redashHostAlias = redashApiKeysPerHost[redashHost]["alias"];
   const redashApiKey    = redashApiKeysPerHost[redashHost]["key"];
-  controller.hears(`${redashHost}/queries/([0-9]+)#([0-9]+)`, slackMessageEvents, (bot, message) => {
+  controller.hears(`${redashHost}/queries/([0-9]+)[^>]*`, slackMessageEvents, (bot, message) => {
     const originalUrl = message.match[0];
     const queryId = message.match[1];
-    const visualizationId =  message.match[2];
-    const queryUrl = `${redashHostAlias}/queries/${queryId}#${visualizationId}`;
-    const embedUrl = `${redashHostAlias}/embed/query/${queryId}/visualization/${visualizationId}?api_key=${redashApiKey}`;
+    const parsedUrl = url.parse(originalUrl, true);
+
+    if(parsedUrl.hash === null) {
+      bot.reply(message, "Please specify visualization id by hash");
+      return;
+    }
+
+    const visualizationId = parsedUrl.hash.substring(1);
+    const search = queryToSearch(parsedUrl.query);
+    const searchWithKey = queryToSearch(Object.assign({ api_key: redashApiKey }, parsedUrl.query));
+    const queryUrl = `${redashHostAlias}/queries/${queryId}${search}#${visualizationId}`;
+    const embedUrl = `${redashHostAlias}/embed/query/${queryId}/visualization/${visualizationId}${searchWithKey}`;
 
     bot.reply(message, `Taking screenshot of ${originalUrl}`);
     bot.botkit.log(queryUrl);
